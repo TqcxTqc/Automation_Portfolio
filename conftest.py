@@ -1,5 +1,5 @@
 import pytest
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import sync_playwright, expect
 
 
 def pytest_addoption(parser):
@@ -42,3 +42,8 @@ def browser(call_playwright, request):
     page.close()
     context.close()
     driver.close()
+
+
+@pytest.fixture()
+def with_expect():
+    return expect
