@@ -2,6 +2,8 @@ import random
 
 
 class BasePage:
+    PAGE_TITLE = "#page-title-heading"
+
     def __init__(self, browser):
         self.browser = browser
 
@@ -15,7 +17,7 @@ class BasePage:
         """
         Checking that page is loaded
         """
-        self.browser.wait_for_load_state("networkidle")
+        self.browser.wait_for_load_state()
         self.browser.wait_for_selector(title_selector)
         self.browser.is_visible(title_selector)
 
@@ -26,6 +28,7 @@ class BasePage:
         self.browser.locator(category).click()
 
     def get_shopping_options_titles(self, locator_items):
+        self.browser.wait_for_selector(locator_items)
         get_items_title = self.browser.query_selector_all(locator_items)
         return [element.text_content() for element in get_items_title]
 
@@ -43,6 +46,7 @@ class BasePage:
         """
         for _ in range(max_attempts):
             try:
+                self.browser.wait_for_load_state()
                 products = self.browser.locator(".price-box.price-final_price").all()
                 if not products:
                     raise Exception("No products found")
@@ -51,6 +55,7 @@ class BasePage:
                 random_product_element = random.choice(products)
                 product_id = random_product_element.get_attribute("data-product-id")
                 print(f"Chosen product ID: {product_id}")
+                self.browser.wait_for_selector(f".swatch-opt-{product_id}")
 
                 # Choose a random size
                 sizes = self.browser.locator(f".swatch-opt-{product_id} .swatch-option.text").all()
@@ -85,3 +90,42 @@ class BasePage:
             return True
         else:
             raise Exception("Product is not added")
+
+    def sort_products_by(self, sort_type, timeout=3000):
+        self.browser.locator("#sorter").first.select_option(sort_type)
+
+        # Wait for the sorting to be applied (You can adjust the wait time based on your needs)
+        self.browser.wait_for_timeout(timeout)
+
+        # Check if the product items are visible
+        product_items = self.browser.locator(".product-items")
+        if not product_items.is_visible():
+            # Handle the case where the product items are not visible
+            self.browser.reload()
+            self.browser.wait_for_load_state()
+
+            # Wait for the sorting to be applied again
+            self.browser.wait_for_timeout(timeout)
+
+            # Check if the product items are visible again
+            if not product_items.is_visible():
+                # Handle the case where the items are still not visible (e.g., raise an exception)
+                raise Exception("Product items are still not visible after refresh.")
+
+    def get_products_details(self):
+        """
+        Retrieve product details from a web page.
+        This method locates and extracts product names and prices from the web page.
+
+        Returns:
+        Tuple of two lists:
+        - List of product names.
+        - List of product prices.
+        """
+        name = ".product-item-details a.product-item-link"
+        price = ".product-item-details span.price"
+        product_name = self.browser.locator(name).all()
+        product_price = self.browser.locator(price).all()
+        product_name_list = [item.text_content().replace("\n", "").strip() for item in product_name]
+        product_price_list = [item.text_content().replace("\n", "").strip() for item in product_price]
+        return product_name_list, product_price_list

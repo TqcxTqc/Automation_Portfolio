@@ -31,5 +31,6 @@ class ClothSize:
     XL = "#option-label-size-143-item-170"
 
 
-class CommonLocators:
+class BaseLocators:
     ALERT_SUCCESS = "div.message-success"
+    SHOP_OPTIONS_CATEGORY = "#narrow-by-list .filter-options-title"
