@@ -5,6 +5,7 @@ from config.locators_pytest_param import ParametrizationData
 
 
 class TestWomenCatalogFeatures(BaseTest):
+    PRICE = "price"
 
     @pytest.fixture()
     def _setup_page(self, browser):
@@ -27,6 +28,6 @@ class TestWomenCatalogFeatures(BaseTest):
 
     def test_sort_items_by_price(self, browser, _setup_page):
         products_not_sorted = self.women_page.get_products_details()
-        self.women_page.sort_products_by("price")
+        self.women_page.sort_products_by(self.PRICE)
         product_sorted_by_price = self.women_page.get_products_details()
         assert products_not_sorted != product_sorted_by_price
