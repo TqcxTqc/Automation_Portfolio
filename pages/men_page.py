@@ -2,7 +2,7 @@ from base.base_page import BasePage
 from pages.common.top_menu import TopMenuBar
 
 
-class MenCatalogPage(BasePage):
+class MenPage(BasePage):
     PAGE_URL = TopMenuBar.MEN_CATALOG
 
     # Category on page
