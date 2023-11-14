@@ -1,4 +1,5 @@
 import random
+import allure
 
 
 class BasePage:
@@ -11,27 +12,33 @@ class BasePage:
         """
         Open the page
         """
-        self.browser.goto(self.PAGE_URL)
+        with allure.step(f"Open {self.PAGE_URL} page"):
+            self.browser.goto(self.PAGE_URL)
 
     def is_opened(self, title_selector):
         """
         Checking that page is loaded
         """
-        self.browser.wait_for_load_state()
-        self.browser.wait_for_selector(title_selector)
-        self.browser.is_visible(title_selector)
+        with allure.step(f"Page {self.PAGE_URL} is opened"):
+            self.browser.wait_for_load_state()
+            self.browser.wait_for_selector(title_selector)
+            with allure.step(f"Title is visible {title_selector}"):
+                self.browser.is_visible(title_selector)
 
     def click_on_category(self, category):
         """
         Taking category locator and click selected category
         """
-        self.browser.locator(category).click()
+        with allure.step(f"Clicked on {category}"):
+            self.browser.locator(category).click()
 
+    @allure.step("Taking shopping titles")
     def get_shopping_options_titles(self, locator_items):
         self.browser.wait_for_selector(locator_items)
         get_items_title = self.browser.query_selector_all(locator_items)
         return [element.text_content() for element in get_items_title]
 
+    @allure.step("Select random cloth")
     def choose_random_cloth(self, max_attempts=3):
         """
         Choose a random clothing product, color, and size.
@@ -84,6 +91,7 @@ class BasePage:
                 # Handle any specific exceptions that may occur during the selection process
                 print(f"Error while choosing product: {e}")
 
+    @allure.step("Check success alert")
     def check_success_alert(self, alert):
         self.browser.wait_for_selector(alert).is_visible()
         if "You added" in self.browser.locator(alert).text_content():
@@ -92,26 +100,28 @@ class BasePage:
             raise Exception("Product is not added")
 
     def sort_products_by(self, sort_type, timeout=3000):
-        self.browser.locator("#sorter").first.select_option(sort_type)
+        with allure.step(f"Sorting products by: {sort_type}"):
+            self.browser.locator("#sorter").first.select_option(sort_type)
 
-        # Wait for the sorting to be applied (You can adjust the wait time based on your needs)
-        self.browser.wait_for_timeout(timeout)
-
-        # Check if the product items are visible
-        product_items = self.browser.locator(".product-items")
-        if not product_items.is_visible():
-            # Handle the case where the product items are not visible
-            self.browser.reload()
-            self.browser.wait_for_load_state()
-
-            # Wait for the sorting to be applied again
+            # Wait for the sorting to be applied (You can adjust the wait time based on your needs)
             self.browser.wait_for_timeout(timeout)
 
-            # Check if the product items are visible again
+            # Check if the product items are visible
+            product_items = self.browser.locator(".product-items")
             if not product_items.is_visible():
-                # Handle the case where the items are still not visible (e.g., raise an exception)
-                raise Exception("Product items are still not visible after refresh.")
+                # Handle the case where the product items are not visible
+                self.browser.reload()
+                self.browser.wait_for_load_state()
 
+                # Wait for the sorting to be applied again
+                self.browser.wait_for_timeout(timeout)
+
+                # Check if the product items are visible again
+                if not product_items.is_visible():
+                    # Handle the case where the items are still not visible (e.g., raise an exception)
+                    raise Exception("Product items are still not visible after refresh.")
+
+    @allure.step("Getting products details")
     def get_products_details(self):
         """
         Retrieve product details from a web page.

@@ -1,5 +1,9 @@
+import os
 import pytest
+import allure
+
 from playwright.sync_api import sync_playwright, expect
+from config.allure_config import add_allure_env
 
 
 def pytest_addoption(parser):
@@ -38,6 +42,8 @@ def browser(call_playwright, request):
     context.set_default_timeout(10000)
     page = context.new_page()
 
+    add_allure_env(context)
+
     yield page
     page.close()
     context.close()
@@ -47,3 +53,12 @@ def browser(call_playwright, request):
 @pytest.fixture()
 def with_expect():
     return expect
+
+
+@pytest.fixture(autouse=True)
+def screenshot_on_failure(request, browser):
+    yield
+    if request.node.rep_call.failed:
+        screenshot_path = os.path.join("reports", "screenshots", f"{request.node.name}_screenshot.png")
+        allure.attach(body=browser.screenshot(path=screenshot_path),
+                      attachment_type=allure.attachment_type.PNG)
