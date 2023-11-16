@@ -1,4 +1,5 @@
 import random
+
 import allure
 
 
@@ -83,7 +84,10 @@ class BasePage:
                     print("Selected a random color")
                     self.browser.wait_for_timeout(500)
 
+                self.browser.wait_for_selector(f"form[action*='/{product_id}/'] button").is_visible()
+                print("selector is visible")
                 self.browser.locator(f"form[action*='/{product_id}/'] button").click()
+                print("Button clicked")
 
                 # Break out of the loop since we successfully selected a product
                 break
@@ -93,6 +97,7 @@ class BasePage:
 
     @allure.step("Check success alert")
     def check_success_alert(self, alert):
+        self.browser.wait_for_load_state()
         self.browser.wait_for_selector(alert).is_visible()
         if "You added" in self.browser.locator(alert).text_content():
             return True

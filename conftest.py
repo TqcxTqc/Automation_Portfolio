@@ -60,5 +60,5 @@ def screenshot_on_failure(request, browser):
     yield
     if request.node.rep_call.failed:
         screenshot_path = os.path.join("reports", "screenshots", f"{request.node.name}_screenshot.png")
-        allure.attach(body=browser.screenshot(path=screenshot_path),
+        allure.attach(body=browser.screenshot(path=screenshot_path, full_page=True),
                       attachment_type=allure.attachment_type.PNG)
