@@ -2,8 +2,11 @@ import os
 import pytest
 import allure
 
+from config.logger import setup_logger
 from playwright.sync_api import sync_playwright, expect
 from config.allure_config import add_allure_env
+
+logger = setup_logger(__name__)
 
 
 def pytest_addoption(parser):
@@ -29,6 +32,8 @@ def browser(call_playwright, request):
     else:
         headless = False
 
+    logger.info(f"Launching {browser} browser in {'headless' if headless else 'headed'} mode.")
+
     if browser == "chromium":
         driver = call_playwright.chromium.launch(headless=headless)
     elif browser == "firefox":
@@ -36,6 +41,7 @@ def browser(call_playwright, request):
     elif browser == "webkit":
         driver = call_playwright.webkit.launch(headless=headless)
     else:
+        logger.error("Unsupported browser type")
         assert False, "Unsupported browser type"
 
     context = driver.new_context()
