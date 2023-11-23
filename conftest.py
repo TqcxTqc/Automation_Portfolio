@@ -3,10 +3,10 @@ import pytest
 import allure
 
 from config.logger import setup_logger
-from playwright.sync_api import sync_playwright, expect
 from config.allure_config import add_allure_env
+from playwright.sync_api import sync_playwright, expect, Error
 
-logger = setup_logger(__name__)
+LOGGER = setup_logger(__name__)
 
 
 def pytest_addoption(parser):
@@ -14,6 +14,17 @@ def pytest_addoption(parser):
                      help="Specify browser: -firefox, -chromium, -webkit")
     parser.addoption("--head", action="store_false",
                      help="Launched in headless mode: if specified then launched in headed mode")
+
+
+@pytest.hookimpl(tryfirst=True)
+def pytest_exception_interact(call):
+    # Check if the exception is a Playwright Error
+    if isinstance(call.excinfo.value, Error):
+        # Create a logfile
+        LOGGER.exception(f"Error occurred during playwright execution: {call.excinfo.typename} / {call.excinfo.value}")
+
+    # Log other exceptions raised during pytest execution
+    LOGGER.exception(f"Error occurred during pytest execution:{call.excinfo.typename} / {call.excinfo.value}")
 
 
 @pytest.fixture(scope="session")
@@ -32,7 +43,7 @@ def browser(call_playwright, request):
     else:
         headless = False
 
-    logger.info(f"Launching {browser} browser in {'headless' if headless else 'headed'} mode.")
+    LOGGER.info(f"Launching {browser} browser in {'headless' if headless else 'headed'} mode.")
 
     if browser == "chromium":
         driver = call_playwright.chromium.launch(headless=headless)
@@ -41,7 +52,7 @@ def browser(call_playwright, request):
     elif browser == "webkit":
         driver = call_playwright.webkit.launch(headless=headless)
     else:
-        logger.error("Unsupported browser type")
+        LOGGER.error("Unsupported browser type")
         assert False, "Unsupported browser type"
 
     context = driver.new_context()
