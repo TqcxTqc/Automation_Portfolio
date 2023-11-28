@@ -1,6 +1,6 @@
 import random
-
 import allure
+from config.logger import setup_logger
 
 
 class BasePage:
@@ -8,11 +8,13 @@ class BasePage:
 
     def __init__(self, browser):
         self.browser = browser
+        self.logger = setup_logger(type(self).__name__)
 
     def open(self):
         """
         Open the page
         """
+        self.logger.info(f"Opening page {self.PAGE_URL}")
         with allure.step(f"Open {self.PAGE_URL} page"):
             self.browser.goto(self.PAGE_URL)
 
@@ -20,9 +22,12 @@ class BasePage:
         """
         Checking that page is loaded
         """
+        self.logger.info(f"{self.PAGE_URL} is opened")
         with allure.step(f"Page {self.PAGE_URL} is opened"):
             self.browser.wait_for_load_state()
+            self.logger.info(f"Waiting {title_selector}")
             self.browser.wait_for_selector(title_selector)
+            self.logger.info(f"{title_selector} is visible")
             with allure.step(f"Title is visible {title_selector}"):
                 self.browser.is_visible(title_selector)
 
@@ -31,6 +36,7 @@ class BasePage:
         Taking category locator and click selected category
         """
         with allure.step(f"Clicked on {category}"):
+            self.logger.info(f"Clicked on {category}")
             self.browser.locator(category).click()
 
     @allure.step("Taking shopping titles")
@@ -57,42 +63,46 @@ class BasePage:
                 self.browser.wait_for_load_state()
                 products = self.browser.locator(".price-box.price-final_price").all()
                 if not products:
+                    self.logger.error(f"Error while choosing: {products}")
                     raise Exception("No products found")
 
                 # Choose a random product
                 random_product_element = random.choice(products)
                 product_id = random_product_element.get_attribute("data-product-id")
-                print(f"Chosen product ID: {product_id}")
+                self.logger.info(f"Chosen product ID: {product_id}")
                 self.browser.wait_for_selector(f".swatch-opt-{product_id}")
 
                 # Choose a random size
                 sizes = self.browser.locator(f".swatch-opt-{product_id} .swatch-option.text").all()
                 if not sizes:
+                    self.logger.error(f"Error while choosing: {sizes}")
                     raise Exception("No sizes found")
                 else:
                     random_size = random.choice(sizes)
                     random_size.click()
-                    print("Selected a random size")
+                    self.logger.info(f"Chosen Size: {random_size}")
 
                 # Choose a random color
                 colors = self.browser.locator(f".swatch-opt-{product_id} .swatch-option.color").all()
                 if not colors:
+                    self.logger.error(f"Error while choosing: {colors}")
                     raise Exception("No colors found")
                 else:
                     random_color = random.choice(colors)
                     random_color.click()
-                    print("Selected a random color")
+                    self.logger.info(f"Chosen color: {random_color}")
                     self.browser.wait_for_timeout(500)
 
                 self.browser.wait_for_selector(f"form[action*='/{product_id}/'] button").is_visible()
-                print("selector is visible")
+                self.logger.info(f"Selector is visible")
                 self.browser.locator(f"form[action*='/{product_id}/'] button").click()
-                print("Button clicked")
+                self.logger.info(f"Button is visible and clicked")
 
                 # Break out of the loop since we successfully selected a product
                 break
             except Exception as e:
                 # Handle any specific exceptions that may occur during the selection process
+                self.logger.error(f"Error while choosing product: {e}")
                 print(f"Error while choosing product: {e}")
 
     @allure.step("Check success alert")
@@ -102,6 +112,7 @@ class BasePage:
         if "You added" in self.browser.locator(alert).text_content():
             return True
         else:
+            self.logger.error("Product is not added")
             raise Exception("Product is not added")
 
     def sort_products_by(self, sort_type, timeout=3000):
@@ -124,6 +135,7 @@ class BasePage:
                 # Check if the product items are visible again
                 if not product_items.is_visible():
                     # Handle the case where the items are still not visible (e.g., raise an exception)
+                    self.logger.error("Product items are still not visible after refresh.")
                     raise Exception("Product items are still not visible after refresh.")
 
     @allure.step("Getting products details")
