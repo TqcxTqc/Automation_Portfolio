@@ -1,0 +1,11 @@
+version: '3.9'
+
+services:
+  my_tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: run_test
+    volumes:
+      - ./reports/:/app/reports
+      - ./logs/:/app/logs
