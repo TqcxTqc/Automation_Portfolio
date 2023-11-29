@@ -5,6 +5,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v2
+      - name: Run UI-Tests via docker-compose
+
+        run: docker-compose up --exit-code-from my_tests || true
+
       - name: Generate Allure report
         run: sudo docker-compose run my_tests /bin/sh -c "ls -la && pwd"
 
