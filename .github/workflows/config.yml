@@ -11,6 +11,25 @@ jobs:
       - name: Generate Allure report
         run: sudo docker-compose run my_tests allure generate ./reports/allure-results --clean -o ./allure-report
 
+      - name: Preserve Allure report artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: allure-report
+          path: allure-report
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: ui-tests
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Download Allure report artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: allure-report
+          path: allure-report
+
       - name: Deploy to Github Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
