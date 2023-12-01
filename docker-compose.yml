@@ -9,3 +9,6 @@ services:
     volumes:
       - ./reports/:/app/reports
       - ./logs/:/app/logs
+      - ./allure-report:/app/allure-report
+    working_dir: /app
+    command: /bin/bash -c "pytest"

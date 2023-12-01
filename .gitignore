@@ -161,3 +161,4 @@ cython_debug/
 reports
 .DS_Store
 logs
+allure-report
