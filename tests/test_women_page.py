@@ -24,7 +24,7 @@ class TestWomenCatalogFeatures(BaseTest):
                                                              id="Shopping Titles")])
     def test_shopping_options_on_tops(self, browser, options_titles, _setup_page):
         shopping_options = self.women_page.get_shopping_options_titles(self.base_locators.SHOP_OPTIONS_CATEGORY)
-        assert options_titles == shopping_options, "'Shopping Options' are not matched"
+        assert options_titles == shopping_options, "'Shopping Options' are not matched!"
 
     @allure.title("The item is added to the cart")
     def test_add_item_to_cart(self, browser, _setup_page):
