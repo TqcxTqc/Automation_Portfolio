@@ -15,7 +15,6 @@ WEBSITE: https://magento.softwaretestingboard.com
 - **Dockerized environment:** The framework is packaged using Docker to ensure consistent test execution across different environments.
 
 ### Getting Started
-<br>
 
 1. #### Clone the repository
 
