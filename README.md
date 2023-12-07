@@ -1,6 +1,6 @@
 # Automated Testing Framework with Python, Docker, Playwright, and Allure Reporting
 
-This repository contains an automation framework built using Python, Playwright, and pytest to test web applications. It utilizes Docker to simplify the test environment setup and execution.
+This repository contains an automation framework built using Python, Playwright, pytest, and Allure to test web applications. It utilizes Docker to simplify the test environment setup and execution, and GitHub Actions to automate testing and report generation
 
 WEBSITE: https://magento.softwaretestingboard.com
 
