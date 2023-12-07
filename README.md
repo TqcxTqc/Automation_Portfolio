@@ -10,8 +10,8 @@ WEBSITE: https://magento.softwaretestingboard.com
 - **Organized test structure:** Tests are structured using Page Objects to maintain separation of concerns and improve test maintainability.
 - **pytest integration:** The framework utilizes pytest as the test runner for executing tests and generating comprehensive test reports.
 - **Allure reporting:** The framework generates comprehensive and detailed test reports using Allure, providing valuable insights into test execution.
-- **GitHub Actions integration:** Automated testing and report generation are integrated with GitHub Actions, ensuring that reports are generated seamlessly after each test execution.
-- **GitHub Pages report publishing:** Generated reports are published to the GitHub Pages repository, making them easily accessible and shareable
+- **CI/CD: Github Action:** Automated testing and report generation are integrated with GitHub Actions, ensuring that reports are generated seamlessly after each test execution.
+- **CI/CD: GitHub Pages:** Generated reports are published to the GitHub Pages repository, making them easily accessible and shareable.
 - **Dockerized environment:** The framework is packaged using Docker to ensure consistent test execution across different environments.
 
 ### Getting Started
